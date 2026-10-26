@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KaffySmart Thrift</title>
+<link rel="icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B4F3A">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#F6F3E6;--cd:#fff;--tx:#10281e;--mu:#6b7d73;--ac:#0B4F3A;--go:#D9A62B;--gd:#8A6410;--bd:#e8e4cf;--ok:#0f7a55;--wa:#b7791f;--no:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+#app{max-width:640px;margin:0 auto;padding:0 14px 96px}
+.hd{position:sticky;top:0;z-index:5;margin:0 -14px;padding:10px 14px;background:linear-gradient(135deg,#0B4F3A,#14694e);color:#fff;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.hd img{width:38px;height:38px;border-radius:10px;background:#fff;object-fit:cover}
+.hd div{flex:1;line-height:1.2}.hd b{display:block;font-size:16px}.hd span{font-size:12px;opacity:.8}
+.hd .b{background:rgba(255,255,255,.16);color:#fff;padding:8px 12px;font-size:13px;font-weight:500}
+h1{font-size:22px;margin:16px 0 4px}
+.mu{color:var(--mu);font-size:13px}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(16,40,30,.05)}
+.card.g{position:relative;overflow:hidden}.card.g::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--go)}
+.av{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;object-fit:cover;background:#dfe9e3;color:var(--ac);font-weight:700;flex-shrink:0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border-bottom:0}
+.act{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.chips{display:flex;gap:6px;margin:14px 0 10px;background:#ebe7d3;padding:4px;border-radius:14px}
+.chips button{flex:1;padding:10px 6px;border:0;background:transparent;color:var(--tx);border-radius:11px;font:inherit;font-size:14px}
+.chips button.on{background:#fff;color:var(--ac);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.b{padding:11px 16px;border:0;border-radius:12px;background:var(--ac);color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.b.g{background:transparent;color:var(--mu);border:1px solid var(--bd);font-weight:500}
+.b.r{background:transparent;color:var(--no);border:1px solid var(--bd)}
+.b.go{background:linear-gradient(135deg,#E8BC4A,#D9A62B);color:#2a1d00}
+.b.w{background:#1fa855;color:#fff}
+.b.full{width:100%;text-align:center}
+.b:disabled{opacity:.6}
+input,select,textarea{width:100%;padding:13px;border:1px solid var(--bd);border-radius:12px;background:#fff;color:var(--tx);font:inherit;margin:6px 0}
+input:focus,select:focus,textarea:focus{outline:2px solid #bfe3cf;border-color:var(--ac)}
+label{font-size:13px;color:var(--mu)}
+.bd{font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
+.bd.paid{color:var(--ok);background:#e4f5ec}.bd.pending{color:var(--wa);background:#fbf0dc}.bd.unpaid{color:var(--no);background:#fbe6e3}
+.paid{color:var(--ok)}.pending{color:var(--wa)}.unpaid{color:var(--no)}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.sum b{display:block;font-size:26px}
+.hands{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hero{text-align:center;padding-top:18px}
+.hero img{width:100%;max-width:520px;height:auto}
+.feat{display:grid;gap:10px;margin:24px 0 10px;text-align:left}
+.feat div{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:13px 14px;display:flex;gap:12px;align-items:center;color:var(--tx)}
+.feat svg{flex-shrink:0;color:var(--ac)}
+svg.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.greet{background:linear-gradient(135deg,#0B4F3A,#1a6b4f);color:#fff;border-radius:18px;padding:18px;margin:14px 0}
+.greet h1{margin:2px 0 4px;font-size:24px}.greet .mu{color:rgba(255,255,255,.8)}
+.bn{position:fixed;left:0;right:0;bottom:0;z-index:6;background:#fff;border-top:1px solid var(--bd);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.bn button{flex:1;position:relative;background:none;border:0;color:var(--mu);font:inherit;font-size:11px;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.bn button.on{color:var(--ac);font-weight:700}
+.bn .badge{position:absolute;top:0;right:20%}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:#fff;padding:11px 18px;border-radius:12px;font-size:14px;display:none;z-index:9;max-width:90%}
+.banner{background:#e8f6ee;border:1px solid #bfe3cf;border-radius:14px;padding:14px;margin:12px 0}
+.badge{background:var(--no);color:#fff;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700}
+</style></head><body>
+<div id="app"><p class="mu">Loading…</p></div><div id="toast"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,updatePassword,updateProfile} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,deleteDoc,collection,onSnapshot,query,where} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const cfg={apiKey:"AIzaSyBD9i0KT8jSqmaIFN_AH94IhUwY9mns034",authDomain:"kaffysmart-thrift.firebaseapp.com",projectId:"kaffysmart-thrift",storageBucket:"kaffysmart-thrift.firebasestorage.app",messagingSenderId:"951421433400",appId:"1:951421433400:web:2a15f0cd73a0829111d8cd"};
+const ADMIN="adedejikafilah@gmail.com";
+const DOM="@kaffysmart.app";
+const fapp=initializeApp(cfg),auth=getAuth(fapp),db=getFirestore(fapp);
+
+const U={D:500,W:3000,M:10000},GL={D:"Every 2 days · ₦500",W:"Weekly (Sunday) · ₦3,000",M:"Monthly · ₦10,000"},GS={D:"Every 2 days",W:"Weekly",M:"Monthly"};
+const S={members:{},subs:{},payments:{},reports:{},settings:{},lines:{},payouts:{},resets:{}};
+let view="landing",role="member",admin=false,me="",tab="status",grp="D",pi=0,err="",busy=false,dirty=false,remind="",last=null,bulkTxt="",bulkRes=[],rm="",clr="",lineTxt={},locked=false,lastHide=0,fpOK=false,installEv=null,skipLock=false,rstRes=null,rsq="",firstSnap={},unsub=[];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const N=n=>"₦"+Number(n||0).toLocaleString("en-NG");
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());
+const dl=d=>d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+const toast=t=>{const e=$("#toast");e.textContent=t;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",3000)};
+const beep=()=>{try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.connect(a.destination);o.frequency.value=880;o.start();setTimeout(()=>{o.stop();a.close()},260)}catch(e){}};
+
+function periods(g){const t=new Date();t.setHours(0,0,0,0);const o=[];
+ if(g==="W"){const d=new Date(t);d.setDate(d.getDate()-d.getDay());for(let i=0;i<5;i++){o.push({k:key(d),l:dl(d)});d.setDate(d.getDate()-7)}}
+ else if(g==="M"){for(let i=0;i<5;i++){const d=new Date(t.getFullYear(),t.getMonth()-i,1),e=new Date(d.getFullYear(),d.getMonth()+1,0);o.push({k:d.getFullYear()+pad(d.getMonth()+1),l:d.toLocaleDateString("en-GB",{month:"long",year:"numeric"})+" (due "+e.getDate()+")"})}}
+ else{const a=S.settings.anchor;if(!a)return[];const A=new Date(a+"T00:00:00"),n=Math.floor(Math.round((t-A)/864e5)/2);for(let i=0;i<5&&n-i>=0;i++){const d=new Date(A);d.setDate(A.getDate()+2*(n-i));o.push({k:key(d),l:dl(d)})}}
+ return o}
+const keyLabel=(g,k)=>g==="M"?new Date(+k.slice(0,4),+k.slice(4)-1,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"}):dl(new Date(+k.slice(0,4),+k.slice(4,6)-1,+k.slice(6)));
+const sid=(c,g,k)=>c+"_"+g+"_"+k;
+const stat=(c,g,k)=>S.payments[sid(c,g,k)]?"paid":S.reports[sid(c,g,k)]?"pending":"unpaid";
+const amt=s=>U[s.g]*s.hands;
+const subsFor=g=>Object.values(S.subs).filter(s=>s.g===g&&s.hands>0&&S.members[s.code]).sort((a,b)=>S.members[a.code].name.localeCompare(S.members[b.code].name));
+const badge=s=>`<span class="bd ${s}">${s==="paid"?"Paid":s==="pending"?"Pending":"Unpaid"}</span>`;
+const btn=(a,l,s,k,c)=>`<button class="b ${c||""}" data-a="${a}" data-c="${s.code}" data-g="${s.g}" data-k="${k}">${l}</button>`;
+const hw=h=>h+" hand"+(h==1?"":"s");
+const phone=p=>{p=String(p||"").replace(/\D/g,"");if(p.startsWith("0"))p="234"+p.slice(1);return p};
+function loginMsg(name,code,pin,url,ph){return "https://wa.me/"+phone(ph)+"?text="+encodeURIComponent(`Hello ${name}, welcome to KaffySmart Thrift online. Open ${url} and tap Member login. Your code: ${code.toUpperCase()}. Temporary PIN: ${pin}. You will create your own secret PIN the first time you log in. After you pay, tap "I've paid". Save Together, Grow Together.`)}
+const wa=(m,s,k,g)=>"https://wa.me/"+phone(m.phone)+"?text="+encodeURIComponent(`Hello ${m.name}, your ${GS[g]} contribution of ${N(amt(s))} for ${keyLabel(g,k)} has been confirmed ✅. Thank you! KaffySmart Thrift: Save Together, Grow Together`);
+
+function render(){
+ if(locked&&auth.currentUser){$("#app").innerHTML=lockView();return}
+ const ae=document.activeElement;
+ if(ae&&(ae.tagName==="INPUT"||ae.tagName==="TEXTAREA")&&ae.closest("#app")&&view==="app"){dirty=true;return}
+ dirty=false;
+ $("#app").innerHTML=view==="landing"?landing():view==="login"?login():view==="setpin"?setpin():view==="terms"?termsView():admin?adminView():memberView();
+}
+document.addEventListener("focusout",()=>setTimeout(()=>{if(dirty)render()},60));
+
+function landing(){const I=p=>`<svg class="ic" viewBox="0 0 24 24">${p}</svg>`;
+ return `<div class="hero"><img src="logo.jpg" alt="KaffySmart Thrift"><button class="b go full" data-a="tologin" data-r="member" style="font-size:18px;padding:15px;margin-top:6px">Member login</button>${installEv?`<button class="b g full" data-a="install" style="margin-top:10px">Install the app on this phone</button>`:""}<div class="feat"><div>${I('<path d="M5 13l4 4L19 7"/>')}<span>See every payment you have made</span></div><div>${I('<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>')}<span>Follow the collection line, fairly and openly</span></div><div>${I('<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>')}<span>Your own secret PIN keeps your account safe</span></div></div><a href="#" class="mu" data-a="tologin" data-r="admin">Admin login</a></div>`}
+function login(){const m=role==="member";
+ return `<div class="hero"><img src="logo.jpg" alt="KaffySmart Thrift" style="max-width:300px"></div><div class="card"><h1>${m?"Member login":"Admin login"}</h1>
+ ${m?`<label>Your code</label><input id="u" placeholder="e.g. M001" autocapitalize="characters" autocomplete="username"><label>Your PIN</label><input id="p" type="password" inputmode="numeric" placeholder="PIN" autocomplete="current-password"><div class="mu">First time? Use the temporary PIN the admin gave you. You will then create your own.</div>`
+ :`<label>Email</label><input id="u" type="email" autocomplete="username"><label>Password</label><input id="p" type="password" autocomplete="current-password">`}
+ <button class="b full" data-a="login" ${busy?"disabled":""}>${busy?"Please wait…":"Log in"}</button>${err?`<div class="unpaid" style="margin-top:10px">${esc(err)}</div>`:""}
+ <div style="margin-top:12px"><a href="#" class="mu" data-a="home">← Back</a></div></div>`}
+
+function setpin(){return `<div class="hero"><img src="logo.jpg" alt="KaffySmart Thrift" style="max-width:300px"></div><div class="card"><h1>Create your own PIN</h1><div class="mu">Choose a secret PIN that only you know. You will use it with your code every time you log in. Do not share it.</div><label>New PIN (6 to 8 digits)</label><input id="n1" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"><label>Type it again</label><input id="n2" type="password" inputmode="numeric" maxlength="8" autocomplete="new-password"><button class="b full" data-a="setpin" ${busy?"disabled":""}>${busy?"Please wait…":"Save my PIN"}</button>${err?`<div class="unpaid" style="margin-top:10px">${esc(err)}</div>`:""}<div style="margin-top:12px"><a href="#" class="mu" data-a="logout">Log out</a></div></div>`}
+
+const av=(m,z)=>{z=z||40;const st=`width:${z}px;height:${z}px;font-size:${Math.round(z*.4)}px`;return m.photo?`<img class="av" style="${st}" src="${m.photo}" alt="">`:`<span class="av" style="${st}">${esc((m.name||"?").trim().slice(0,1).toUpperCase())}</span>`};
+const shrink=f=>new Promise((res,rej)=>{const img=new Image(),u=URL.createObjectURL(f);img.onload=()=>{const c=document.createElement("canvas"),z=160,sc=Math.max(z/img.width,z/img.height),w=img.width*sc,h=img.height*sc;c.width=c.height=z;c.getContext("2d").drawImage(img,(z-w)/2,(z-h)/2,w,h);URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",.72))};img.onerror=rej;img.src=u});
+const FEE0={D:500,W:1000,M:1000};
+const fee=g=>(S.settings.fees&&S.settings.fees[g]!=null)?S.settings.fees[g]:FEE0[g];
+const byNick=n=>Object.values(S.members).find(m=>(m.nick||"").trim().toLowerCase()===String(n).trim().toLowerCase());
+const kd=(g,k)=>g==="M"?new Date(+k.slice(0,4),+k.slice(4)-1,1):new Date(+k.slice(0,4),+k.slice(4,6)-1,+k.slice(6));
+const cycN=(g,k0,k)=>{const a=kd(g,k0),b=kd(g,k);if(g==="M")return(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth();return Math.floor(Math.round((b-a)/864e5)/(g==="D"?2:7))};
+const collector=(g,k)=>{const L=S.lines[g];if(!L||!L.slots||!L.slots.length||!L.startKey)return null;const n=cycN(g,L.startKey,k),len=L.slots.length,i=(((L.startPos-1+n)%len)+len)%len;return{pos:i+1,nick:L.slots[i],amount:len*U[g]-fee(g),len}};
+const turnDate=(g,k,i)=>{const d=kd(g,k);if(g==="M"){d.setMonth(d.getMonth()+i);return d.toLocaleDateString("en-GB",{month:"long",year:"numeric"})}d.setDate(d.getDate()+i*(g==="D"?2:7));return dl(d)};
+const remLink=(m,s,k)=>"https://wa.me/"+phone(m.phone)+"?text="+encodeURIComponent(`Hello ${m.name}, a gentle reminder: your ${GS[s.g]} contribution of ${N(amt(s))} for ${keyLabel(s.g,k)} has not been received yet. Please pay and tap "I've paid" on the website: ${location.origin+location.pathname} . Thank you. KaffySmart Thrift`);
+
+const FPK=()=>"fp:"+(auth.currentUser?auth.currentUser.uid:"");
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+const unb64=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
+const fpOn=()=>{try{return !!localStorage.getItem(FPK())}catch(e){return false}};
+async function fpSupported(){try{return !!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch(e){return false}}
+async function fpEnable(){const u=auth.currentUser;
+ const cr=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:"KaffySmart Thrift",id:location.hostname},user:{id:new TextEncoder().encode(u.uid),name:u.email,displayName:u.email},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"discouraged"},timeout:60000}});
+ localStorage.setItem(FPK(),b64(cr.rawId))}
+async function fpCheck(){await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:"public-key",id:unb64(localStorage.getItem(FPK()))}],userVerification:"required",timeout:60000}})}
+function fpCard(){
+ if(!fpOK)return '<div class="card mu">Fingerprint lock is not available on this phone or browser.</div>';
+ return fpOn()?`<div class="card"><b>Fingerprint lock is ON</b><div class="mu" style="margin:4px 0 10px">This phone asks for your fingerprint or face before opening your account.</div><button class="b g" data-a="fpoff">Turn off</button></div>`
+ :`<div class="card"><b>Fingerprint lock</b><div class="mu" style="margin:4px 0 10px">Open your account with your fingerprint or face on this phone. Tap Lock instead of Log out, and next time you can choose fingerprint or your code and PIN.</div><button class="b" data-a="fpon">Turn on</button></div>`}
+function lockView(){return `<div class="hero"><img src="logo.jpg" alt="KaffySmart Thrift" style="max-width:300px"><div class="card"><h1>Locked</h1><div class="mu">Open with your fingerprint or face, or use your code and PIN instead.</div><button class="b go full" data-a="unlock" style="margin-top:12px">Unlock</button>${err?`<div class="unpaid" style="margin-top:10px">${esc(err)}</div>`:""}<div style="margin-top:12px"><a href="#" class="mu" data-a="logout">Use my code and PIN instead</a></div></div></div>`}
+const resetMsg=(name,code,pin)=>`Hello ${name}, your KaffySmart Thrift PIN has been reset. Open ${location.origin+location.pathname} and tap Member login. Your code: ${code.toUpperCase()}. Temporary PIN: ${pin}. You will then create a new secret PIN. Do not share it with anyone.`;
+
+function termsView(){return `<header class="hd"><img src="icon.png" alt=""><div><b>KaffySmart Thrift</b><span>Terms and conditions</span></div><button class="b" data-a="logout">Log out</button></header><div class="card"><h1 style="margin-top:0">Please read and agree</h1><div style="white-space:pre-wrap;font-size:15px;margin:10px 0">${esc(S.settings.terms||"")}</div><label style="display:flex;gap:10px;align-items:flex-start;color:var(--tx);font-size:15px;margin:14px 0"><input type="checkbox" id="tk" style="width:auto;margin:4px 0 0"> I have read and agree to these terms</label><button class="b go full" data-a="agree">Continue</button></div>`}
+
+function backup(){
+ const q=v=>{v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v},row=a=>a.map(q).join(","),L=[];
+ L.push("MEMBERS");L.push(row(["code","name","phone","nickname","2-day hands","weekly hands","monthly hands","terms accepted"]));
+ Object.values(S.members).sort((a,b)=>a.code.localeCompare(b.code)).forEach(m=>L.push(row([m.code.toUpperCase(),m.name,m.phone,m.nick,...["D","W","M"].map(g=>(S.subs[m.code+"_"+g]||{}).hands||0),m.terms?m.terms.at:""])));
+ L.push("");
+ ["D","W","M"].forEach(g=>{const l=S.lines[g]||{};L.push("LINE "+GS[g]+" (position "+(l.startPos||"")+" at cycle "+(l.startKey||"")+")");L.push(row(["number","nickname"]));(l.slots||[]).forEach((n,i)=>L.push(row([i+1,n])));L.push("")});
+ L.push("PAYMENTS (last 170 days)");L.push(row(["code","group","period","amount","confirmed at"]));
+ Object.values(S.payments).sort((a,b)=>(a.at||"").localeCompare(b.at||"")).forEach(p=>L.push(row([String(p.code).toUpperCase(),GS[p.g],p.k,p.amount,p.at])));
+ L.push("");L.push("PAYOUTS");L.push(row(["group","period","nickname","amount","at"]));
+ Object.values(S.payouts).sort((a,b)=>(a.at||"").localeCompare(b.at||"")).forEach(p=>L.push(row([GS[p.g],p.k,p.nick,p.amount,p.at])));
+ L.push("");L.push("SETTINGS");L.push(row(["2-day start date",S.settings.anchor||""]));
+ const bl=new Blob(["\ufeff"+L.join("\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="KaffySmart-backup-"+key(new Date())+".csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+
+/* ---------- ADMIN ---------- */
+function adminView(){const np=Object.keys(S.reports).length;document.title=(np?"("+np+") ":"")+"KaffySmart Thrift";
+ const IC={status:'<path d="M4 6h16M4 12h16M4 18h10"/>',pending:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',members:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.6 3.5 6"/>',line:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>'};
+ const T=[["status","Status"],["pending","Pending"],["members","Members"],["line","Line"]];
+ let h=`<header class="hd"><img src="icon.png" alt=""><div><b>KaffySmart Thrift</b><span>Admin dashboard</span></div><button class="b" data-a="${fpOn()?"lock":"logout"}">${fpOn()?"Lock":"Log out"}</button></header>`;
+ if(last)h+=`<div class="banner"><b>Confirmed ✅</b> ${esc(last.name)}<div style="margin:8px 0 0"><a class="b w" target="_blank" rel="noopener" href="${last.url}">Send WhatsApp confirmation</a> <button class="b g" data-a="dismiss">Close</button></div></div>`;
+ h+=tab==="status"?statusTab():tab==="pending"?pendingTab():tab==="line"?lineTab():membersTab();
+ return h+'<nav class="bn">'+T.map(([t,l])=>`<button data-t="${t}" class="${tab===t?"on":""}"><svg class="ic" viewBox="0 0 24 24">${IC[t]}</svg>${l}${t==="pending"&&np?`<span class="badge">${np}</span>`:""}</button>`).join("")+"</nav>"}
+function statusTab(){
+ let h='<div class="chips">'+["D","W","M"].map(g=>`<button data-gp="${g}" class="${grp===g?"on":""}">${GS[g]}</button>`).join("")+"</div>";
+ const ps=periods(grp);
+ if(!ps.length)return h+`<div class="card"><b>Set the start date</b><div class="mu">Pick the first day of the ₦500 cycle. Every 2 days is counted from it.</div><input type="date" id="anc" value="${esc(S.settings.anchor||"")}"><button class="b" data-a="anchor">Save</button></div>`;
+ if(pi>=ps.length)pi=0;
+ const k=ps[pi].k,list=subsFor(grp);let paid=0,pend=0,un=0,got=0,exp=0;
+ list.forEach(s=>{const st=stat(s.code,grp,k);exp+=amt(s);if(st==="paid"){paid++;got+=amt(s)}else if(st==="pending")pend++;else un++});
+ h+=`<select id="per">${ps.map((p,i)=>`<option value="${i}" ${i===pi?"selected":""}>${esc(p.l)}${i===0?" (current)":""}</option>`).join("")}</select>`;
+ h+=`<div class="card sum"><div><b class="paid">${paid}</b><span class="mu">Paid</span></div><div><b class="pending">${pend}</b><span class="mu">Pending</span></div><div><b class="unpaid">${un}</b><span class="mu">Unpaid</span></div></div><div class="mu">Collected ${N(got)} of ${N(exp)} expected</div>`;
+ h+='<div class="card">'+(list.length?list.map(s=>{const m=S.members[s.code],st=stat(s.code,s.g,k);return `<div class="row"><div style="display:flex;gap:10px;align-items:center">${av(m)}<div><b>${esc(m.name)}</b> <span class="mu">${s.code.toUpperCase()} · ${hw(s.hands)}</span><div class="mu">${N(amt(s))}</div></div></div><div class="act">${badge(st)}${st==="unpaid"&&m.phone?`<a class="b w" style="padding:8px 10px;font-size:13px" target="_blank" rel="noopener" href="${remLink(m,s,k)}">Remind</a>`:""}${st==="paid"?btn("undo","Undo",s,k,"g"):btn("confirm",st==="pending"?"Confirm":"Mark paid",s,k)}</div></div>`}).join(""):'<div class="mu">No one is in this group yet. Add members in the Members tab.</div>')+"</div>";
+ if(un){h+='<button class="b g full" data-a="remind">Write reminder for unpaid</button>';if(remind)h+=`<textarea id="rm" rows="6" style="margin-top:8px">${esc(remind)}</textarea><div class="mu">Select all, copy, and paste into your WhatsApp group.</div>`}
+ return h}
+function pendingTab(){const r=Object.entries(S.reports);
+ if(!r.length)return '<div class="card mu">Nothing waiting. When members tap “I’ve paid”, it shows here.</div>';
+ return '<div class="card">'+r.map(([id,x])=>{const m=S.members[x.code],s=S.subs[x.code+"_"+x.g]||{code:x.code,g:x.g,hands:0};
+  return `<div class="row"><div><b>${esc(m?m.name:x.code)}</b> <span class="mu">${x.code.toUpperCase()}</span><div class="mu">${GS[x.g]} · ${esc(keyLabel(x.g,x.k))} · ${N(amt(s))}</div></div><div class="act">${btn("confirm","Confirm",s,x.k)}${btn("reject","✕",s,x.k,"r")}</div></div>`}).join("")+"</div>"}
+function membersTab(){const ms=Object.values(S.members).sort((a,b)=>a.code.localeCompare(b.code));
+ let h=(rstRes?`<div class="banner"><b>PIN reset for ${esc(rstRes.name)}</b><div class="mu" style="margin:4px 0 8px">Code ${rstRes.code.toUpperCase()} · Temporary PIN ${rstRes.pin}. Shown only once.</div>${rstRes.phone?`<a class="b w" target="_blank" rel="noopener" href="https://wa.me/${phone(rstRes.phone)}?text=${encodeURIComponent(resetMsg(rstRes.name,rstRes.code,rstRes.pin))}">WhatsApp</a> `:""}<button class="b g" data-a="rstclose">Close</button></div>`:"")+`<div class="card"><b>Add member</b><input id="nm" placeholder="Full name"><input id="ph" type="tel" placeholder="WhatsApp number, e.g. 0803…"><input id="nn" placeholder="Nickname (shown in the collection line)"><input id="pn" inputmode="numeric" placeholder="Temporary PIN (6 to 8 digits)" value="${String(Math.floor(100000+Math.random()*900000))}"><div class="mu" style="margin-bottom:8px">Give the member their code and this temporary PIN. At first login they will create their own secret PIN.</div><button class="b" data-a="addm" ${busy?"disabled":""}>${busy?"Adding…":"Add member"}</button></div>`;
+ h+=`<div class="card"><b>Add many members</b><div class="mu" style="margin:4px 0 8px">One person per line:<br>Name, WhatsApp number, hands every 2 days, hands weekly, hands monthly, nickname<br>Example: Ayomide Adedeji, 08031234567, 3, 1, 0, Kafi</div><textarea id="bulk" rows="8" placeholder="Name, phone, 2-day hands, weekly hands, monthly hands, nickname">${esc(bulkTxt)}</textarea><button class="b" data-a="bulk" ${busy?"disabled":""}>${busy?"Adding… please wait":"Add all members"}</button></div>`;
+ if(bulkRes.length){const ok=bulkRes.filter(r=>r.ok),bad=bulkRes.length-ok.length;
+  h+=`<div class="banner"><b>Added ${ok.length} member(s)</b>${bad?` <span class="unpaid">${bad} failed</span>`:""}<div class="mu">Save these now. The temporary PINs are shown only once.</div>`+bulkRes.map(r=>r.ok?`<div class="row"><div><b>${esc(r.name)}</b><div class="mu">${r.code.toUpperCase()} · PIN ${r.pin}</div></div>${r.phone?`<a class="b w" target="_blank" rel="noopener" href="${r.link}">WhatsApp</a>`:""}</div>`:`<div class="row"><div>${esc(r.name)}<div class="unpaid">${esc(r.msg)}</div></div></div>`).join("")+`<textarea rows="6" style="margin-top:8px">${esc(ok.map(r=>r.name+" | "+r.code.toUpperCase()+" | "+r.pin).join("\n"))}</textarea><button class="b g" data-a="bulkclose" style="margin-top:8px">Close</button></div>`}
+ h+=ms.map(m=>`<div class="card"><div style="display:flex;gap:10px;align-items:center;margin-bottom:4px">${av(m,44)}<div><b>${esc(m.name)}</b> <span class="mu">Code: <b>${m.code.toUpperCase()}</b></span></div></div>${m.terms?`<div class="mu" style="margin-top:4px">Terms accepted ✓ ${new Date(m.terms.at).toLocaleDateString("en-GB")}</div>`:(S.settings.terms?`<div class="unpaid" style="font-size:13px;margin-top:4px">Terms not accepted yet</div>`:"")}<label style="display:block;margin-top:6px">Nickname (public name in the collection line)</label><input id="nk_${m.code}" value="${esc(m.nick||"")}"><div class="hands">${["D","W","M"].map(g=>`<div><label>${GS[g]} hands</label><input type="number" min="0" step="0.5" id="h_${m.code}_${g}" value="${(S.subs[m.code+"_"+g]||{}).hands||0}"></div>`).join("")}</div><button class="b" data-a="hands" data-c="${m.code}">Save</button> ${rsq===m.code?`<button class="b r" data-a="rsdo" data-c="${m.code}">Tap again to reset PIN</button>`:`<button class="b g" data-a="rsask" data-c="${m.code}">Reset PIN</button>`} ${rm===m.code?`<button class="b r" data-a="rmdo" data-c="${m.code}">Tap again to remove</button>`:`<button class="b g" data-a="rmask" data-c="${m.code}">Remove</button>`}</div>`).join("");
+ return h+`<div class="card"><b>₦500 cycle start date</b><input type="date" id="anc" value="${esc(S.settings.anchor||"")}"><button class="b g" data-a="anchor">Save</button></div>`+`<div class="card"><b>Terms and conditions</b><div class="mu" style="margin:4px 0 8px">Members must accept these when they log in. Each time you save, everyone is asked to accept again. Leave empty to turn it off.</div><textarea id="tc" rows="12">${esc(S.settings.terms||"")}</textarea><button class="b" data-a="saveterms">Save terms</button></div>`+`<div class="card"><b>Backup</b><div class="mu" style="margin:4px 0 8px">Download your records (members, lines, payments) as a spreadsheet file. PINs are never saved in it. Do this every week or two.</div><button class="b" data-a="backup">Download backup</button></div>`+fpCard()}
+
+function lineTab(){
+ let h='<div class="chips">'+["D","W","M"].map(g=>`<button data-gp="${g}" class="${grp===g?"on":""}">${GS[g]}</button>`).join("")+"</div>";
+ const g=grp,L=S.lines[g]||{},ps=periods(g);
+ if(!ps.length)return h+'<div class="card mu">Set the ₦500 start date first (Status tab).</div>';
+ if(pi>=ps.length)pi=0;
+ const k=ps[pi].k,c=collector(g,k),pid=g+"_"+k;
+ h+=`<select id="per">${ps.map((p,i)=>`<option value="${i}" ${i===pi?"selected":""}>${esc(p.l)}${i===0?" (current)":""}</option>`).join("")}</select>`;
+ if(c){const o=byNick(c.nick),po=S.payouts[pid];
+  h+=`<div class="card"><b>Collecting: #${c.pos} ${esc(c.nick)}</b><div class="mu">${o?esc(o.name)+" · only you see this":"No member has this nickname yet"}</div><div style="margin:8px 0"><b>${N(c.amount)}</b> <span class="mu">${c.len} hands × ${N(U[g])} − ${N(fee(g))} charge</span></div>${po?`<span class="bd paid">Paid out</span> <button class="b g" data-a="unpayout" data-g="${g}" data-k="${k}">Undo</button>`:`<button class="b" data-a="payout" data-g="${g}" data-k="${k}">Paid out</button>`}</div>`}
+ else h+='<div class="card mu">Save the line below, then set where it is now.</div>';
+ h+=`<div class="card"><b>Where is the line now?</b><div class="mu">Collector number for ${esc(ps[pi].l)}</div><input type="number" id="sp" min="1" value="${c?c.pos:""}"><button class="b" data-a="setpos" data-g="${g}" data-k="${k}">Set</button></div>`;
+ const txt=lineTxt[g]!=null?lineTxt[g]:(L.slots||[]).map((n,i)=>(i+1)+", "+n).join("\n");
+ h+=`<div class="card"><b>The line</b><div class="mu" style="margin:4px 0 6px">One per line: number, nickname</div><textarea id="ln" rows="10">${esc(txt)}</textarea><button class="b" data-a="saveline" data-g="${g}">Save line</button></div>`;
+ const slots=L.slots||[],cnt={},issues=[];slots.forEach(n=>{const q=n.trim().toLowerCase();cnt[q]=(cnt[q]||0)+1});
+ Object.keys(cnt).forEach(q=>{const o=byNick(q);if(!o)issues.push("No member has the nickname “"+q+"”");else{const hn=((S.subs[o.code+"_"+g]||{}).hands)||0;if(hn!==cnt[q])issues.push(o.name+": "+cnt[q]+" place(s) in the line but "+hn+" hand(s)")}});
+ subsFor(g).forEach(s=>{const m=S.members[s.code];if(!m.nick||!cnt[m.nick.trim().toLowerCase()])issues.push(m.name+" has "+s.hands+" hand(s) but no place in this line")});
+ h+=`<div class="card"><b>Line check</b>${slots.length?(issues.length?issues.map(x=>`<div class="unpaid" style="margin-top:6px">${esc(x)}</div>`).join(""):'<div class="paid" style="margin-top:6px">All places match the members’ hands ✓</div>'):'<div class="mu">No line saved yet.</div>'}</div>`;
+ h+=`<div class="card"><b>Your charge per cycle</b><div class="hands">${["D","W","M"].map(x=>`<div><label>${GS[x]}</label><input type="number" min="0" id="fe_${x}" value="${fee(x)}"></div>`).join("")}</div><button class="b g" data-a="fees">Save charges</button></div>`;
+ h+=`<div class="card"><b>Finished this round?</b><div class="mu" style="margin:4px 0 8px">Clears this group’s line so you can paste a new one. Past payouts stay saved.</div>${clr===g?`<button class="b r full" data-a="clrdo" data-g="${g}">Tap again to clear the ${GS[g]} line</button>`:`<button class="b g full" data-a="clrask" data-g="${g}">Clear line</button>`}</div>`;
+ h+=`<div class="card"><b>Full line (only you see names)</b>`+slots.map((n,i)=>{const o=byNick(n);return `<div class="row"><div>#${i+1} <b>${esc(n)}</b></div><div class="mu">${o?esc(o.name):"no match"}</div></div>`}).join("")+`</div>`;
+ return h}
+
+/* ---------- MEMBER ---------- */
+function memberView(){const m=S.members[me];
+ if(!m)return '<p class="mu">Loading…</p>';
+ const my=Object.values(S.subs).filter(s=>s.code===me&&s.hands>0).sort((a,b)=>a.g.localeCompare(b.g));
+ let h=`<header class="hd"><img src="icon.png" alt=""><div><b>KaffySmart Thrift</b><span>Member</span></div><button class="b" data-a="${fpOn()?"lock":"logout"}">${fpOn()?"Lock":"Log out"}</button></header><div class="greet" style="display:flex;gap:14px;align-items:center"><div style="text-align:center">${av(m,64)}<a href="#" data-a="pick" style="color:#fff;font-size:12px;display:block;margin-top:4px">Change photo</a></div><div><div class="mu">Welcome back</div><h1>${esc(m.name)}</h1><div class="mu">Your code: ${me.toUpperCase()}</div></div></div><input type="file" id="pf" accept="image/*" hidden>`;
+ if(!my.length)h+='<div class="card mu">You are not in any contribution yet.</div>';
+ my.forEach(s=>{h+=`<div class="card g"><b>${GL[s.g]}</b><div class="mu">${hw(s.hands)} · ${N(amt(s))} each time</div>`;
+  const k0=(periods(s.g)[0]||{}).k,cc=k0?collector(s.g,k0):null;
+  if(cc){const nk=(m.nick||"").trim().toLowerCase(),L=S.lines[s.g],turns=[];
+   if(nk)for(let i=0;i<cc.len&&turns.length<3;i++){const ix=(cc.pos-1+i)%cc.len;if(L.slots[ix].trim().toLowerCase()===nk)turns.push("#"+(ix+1)+" · "+(i===0?"this cycle":turnDate(s.g,k0,i)))}
+   h+=`<div class="banner"><b>Collecting now: #${cc.pos} ${esc(cc.nick)}</b><div class="mu">${N(cc.amount)} · ${S.payouts[s.g+"_"+k0]?"Paid out ✅":"Not yet paid out"}</div>${turns.length?`<div style="margin-top:6px"><b>Your turns:</b> ${turns.join(" · ")}</div>`:""}</div>`;
+   h+=`<details style="margin:8px 0"><summary style="cursor:pointer;color:var(--ac);font-weight:600">See the full line (${cc.len} places)</summary>${L.slots.map((n,i)=>`<div class="row"><div>#${i+1} ${esc(n)}${n.trim().toLowerCase()===nk?` <span class="bd paid">You</span>`:""}</div>${i+1===cc.pos?`<span class="bd pending">Collecting now</span>`:""}</div>`).join("")}</details>`}
+  const ps=periods(s.g).slice(0,4);
+  h+=ps.length?ps.map(p=>{const st=stat(me,s.g,p.k);return `<div class="row"><div>${esc(p.l)}</div><div class="act">${badge(st)}${st==="unpaid"?btn("report","I’ve paid",s,p.k):""}</div></div>`}).join(""):'<div class="mu">Not started yet.</div>';
+  h+="</div>"});
+ return h+'<div class="mu">After you transfer, tap “I’ve paid”. The admin confirms it against the bank alert and you will see it change to Paid. No receipt needed.</div><button class="b g full" data-a="refresh" style="margin-top:12px">Refresh</button>'+fpCard()}
+async function loadMember(){
+ const code=me,[m,st]=await Promise.all([getDoc(doc(db,"members",code)),getDoc(doc(db,"settings","main"))]);
+ if(!m.exists())throw new Error("no-member");
+ S.members={[code]:m.data()};S.settings=st.exists()?st.data():{};S.subs={};S.payments={};S.reports={};
+ const ds=await Promise.all(["D","W","M"].map(g=>getDoc(doc(db,"subs",code+"_"+g))));
+ const jobs=[];
+ ds.filter(d=>d.exists()).forEach(d=>{const s=d.data();S.subs[d.id]=s;if(s.hands>0)periods(s.g).slice(0,4).forEach(p=>{const id=sid(code,s.g,p.k);
+  jobs.push(getDoc(doc(db,"payments",id)).then(x=>{if(x.exists())S.payments[id]=x.data()}),getDoc(doc(db,"reports",id)).then(x=>{if(x.exists())S.reports[id]=x.data()}))})});
+ const ld=await Promise.all(["D","W","M"].map(g=>getDoc(doc(db,"lines",g))));S.lines={};ld.forEach(d=>{if(d.exists())S.lines[d.id]=d.data()});S.payouts={};
+ await Promise.all(["D","W","M"].filter(g=>S.subs[code+"_"+g]&&S.subs[code+"_"+g].hands>0).map(async g=>{const k0=(periods(g)[0]||{}).k;if(!k0)return;const x=await getDoc(doc(db,"payouts",g+"_"+k0));if(x.exists())S.payouts[g+"_"+k0]=x.data()}));
+ await Promise.all(jobs);
+ const tx=S.settings.terms,tv=S.settings.termsV||1,mt=S.members[code].terms;
+ if(tx&&(!mt||mt.v<tv))view="terms";else if(view==="terms")view="app";
+ render()}
+
+/* ---------- ACTIONS ---------- */
+document.addEventListener("input",e=>{if(e.target.id==="bulk")bulkTxt=e.target.value;if(e.target.id==="ln")lineTxt[grp]=e.target.value});
+document.addEventListener("change",async e=>{if(e.target.id==="pf"&&e.target.files[0]){try{const p=await shrink(e.target.files[0]);await setDoc(doc(db,"members",me),{photo:p},{merge:true});S.members[me].photo=p;render();toast("Photo saved")}catch(x){toast("Could not save the photo. Try a different picture.")}return}if(e.target.id==="per"){pi=+e.target.value;remind="";render()}});
+document.addEventListener("click",async e=>{
+ const el=e.target.closest("[data-t],[data-gp],[data-a]");if(!el)return;
+ if(el.tagName==="A")e.preventDefault();
+ if(el.dataset.t){tab=el.dataset.t;remind="";clr="";rm="";window.scrollTo(0,0);render();return}
+ if(el.dataset.gp){grp=el.dataset.gp;pi=0;remind="";clr="";render();return}
+ const a=el.dataset.a,c=el.dataset.c,g=el.dataset.g,k=el.dataset.k,id=c&&sid(c,g,k);
+ try{
+  if(a==="tologin"){role=el.dataset.r;view="login";err="";render()}
+  else if(a==="home"){view="landing";err="";render()}
+  else if(a==="login"){const u=($("#u").value||"").trim(),p=($("#p").value||"").trim();if(!u||!p){err="Please fill both boxes.";render();return}
+   busy=true;err="";render();
+   try{let email=u,pw=p;if(role==="member"){const lc=u.toLowerCase();let n=0;try{const r=await getDoc(doc(db,"resets",lc));if(r.exists())n=r.data().n||0}catch(z){}email=lc+(n?"r"+n:"")+DOM;pw=p+"-"+lc}skipLock=true;await signInWithEmailAndPassword(auth,email,pw)}
+   catch(x){skipLock=false;busy=false;err=role==="member"?"Wrong code or PIN. Please check and try again.":"Wrong email or password.";if(x.code==="auth/api-key-not-valid"||x.code==="auth/invalid-api-key")err="Setup problem: the site key is not valid.";render()}}
+  else if(a==="logout"){await signOut(auth)}
+  else if(a==="setpin"){const n1=($("#n1").value||"").trim(),n2=($("#n2").value||"").trim();
+   if(!/^\d{6,8}$/.test(n1)){err="PIN must be 6 to 8 digits.";render();return}
+   if(n1!==n2){err="The two PINs do not match.";render();return}
+   busy=true;err="";render();
+   try{await updatePassword(auth.currentUser,n1+"-"+me);await updateProfile(auth.currentUser,{displayName:"set"});busy=false;view="app";render();await loadMember();toast("PIN saved. Use it next time you log in.")}
+   catch(x){busy=false;err=x.code==="auth/requires-recent-login"?"Please log out and log in again, then try once more.":"Could not save your PIN. Try again.";render()}}
+  else if(a==="bulkclose"){bulkRes=[];render()}
+  else if(a==="bulk"){const lines=($("#bulk").value||"").split("\n").map(x=>x.trim()).filter(Boolean);
+   if(!lines.length){toast("Paste your list first");return}
+   if(lines.length>60){toast("Add up to 60 people at a time");return}
+   busy=true;bulkRes=[];render();
+   const sa=getAuth(initializeApp(cfg,"sec"+Date.now())),url=location.origin+location.pathname;
+   let mx=Object.keys(S.members).reduce((x,y)=>Math.max(x,parseInt(y.slice(1))||0),S.settings.maxCode||0);
+   for(const ln of lines){const p=ln.split(/[,\t]/).map(x=>x.trim()),name=p[0];if(!name)continue;
+    const ph=p[1]||"",h=[2,3,4].map(i=>parseFloat(p[i])||0),pin=String(Math.floor(100000+Math.random()*900000)),code="m"+String(mx+1).padStart(3,"0");
+    try{const cr=await createUserWithEmailAndPassword(sa,code+DOM,pin+"-"+code);mx++;
+     await setDoc(doc(db,"members",code),{code,name,nick:p[5]||"",phone:ph,uid:cr.user.uid,at:new Date().toISOString()});
+     for(let i=0;i<3;i++){if(h[i]>0)await setDoc(doc(db,"subs",code+"_"+"DWM"[i]),{code,g:"DWM"[i],hands:h[i]})}
+     bulkRes.push({ok:1,code,name,pin,phone:ph,link:loginMsg(name,code,pin,url,ph)})}
+    catch(x){bulkRes.push({ok:0,name,msg:"Could not add this person. Check the line."})}}
+   try{await setDoc(doc(db,"settings","main"),{maxCode:mx},{merge:true});await signOut(sa)}catch(x){}
+   bulkTxt="";busy=false;render()}
+  else if(a==="saveline"){const slots=($("#ln").value||"").split("\n").map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/^\d+(\s*[,.\-:)]+\s*|\s+)/,"").trim()).filter(Boolean);
+   if(!slots.length){toast("Paste the line first");return}
+   await setDoc(doc(db,"lines",g),{slots},{merge:true});delete lineTxt[g];toast("Line saved: "+slots.length+" places")}
+  else if(a==="setpos"){const n=parseInt($("#sp").value),len=((S.lines[g]||{}).slots||[]).length;
+   if(!n||n<1||n>len){toast("Enter a number from 1 to "+len);return}
+   await setDoc(doc(db,"lines",g),{startKey:k,startPos:n},{merge:true});toast("Saved")}
+  else if(a==="payout"){const cc=collector(g,k);await setDoc(doc(db,"payouts",g+"_"+k),{g,k,nick:cc?cc.nick:"",amount:cc?cc.amount:0,at:new Date().toISOString()});toast("Marked as paid out")}
+  else if(a==="unpayout"){await deleteDoc(doc(db,"payouts",g+"_"+k));toast("Undone")}
+  else if(a==="fees"){const f={};for(const x of ["D","W","M"])f[x]=parseFloat($("#fe_"+x).value)||0;await setDoc(doc(db,"settings","main"),{fees:f},{merge:true});toast("Saved")}
+  else if(a==="clrask"){clr=g;render()}
+  else if(a==="clrdo"){await deleteDoc(doc(db,"lines",g));clr="";delete lineTxt[g];toast("Line cleared")}
+  else if(a==="rmask"){rm=c;render()}
+  else if(a==="rmdo"){await deleteDoc(doc(db,"members",c));for(const gg of ["D","W","M"])await deleteDoc(doc(db,"subs",c+"_"+gg));rm="";toast("Member removed")}
+  else if(a==="pick"){$("#pf").click()}
+  else if(a==="agree"){if(!$("#tk").checked){toast("Please tick the box to continue");return}
+   const t={v:S.settings.termsV||1,at:new Date().toISOString()};await setDoc(doc(db,"members",me),{terms:t},{merge:true});S.members[me].terms=t;view="app";render();toast("Thank you")}
+  else if(a==="saveterms"){const t=($("#tc").value||"").trim();await setDoc(doc(db,"settings","main"),{terms:t,termsV:(S.settings.termsV||0)+1},{merge:true});toast(t?"Terms saved. Members will be asked to accept.":"Terms removed")}
+  else if(a==="install"){if(installEv){installEv.prompt();try{await installEv.userChoice}catch(x){}installEv=null;render()}}
+  else if(a==="backup"){backup();toast("Backup downloaded")}
+  else if(a==="lock"){locked=true;render()}
+  else if(a==="unlock"){try{await fpCheck();locked=false;err="";render()}catch(x){err="Fingerprint not recognised. Try again.";render()}}
+  else if(a==="fpon"){try{await fpEnable();toast("Fingerprint lock is on");render()}catch(x){toast("Could not turn it on. Make sure a fingerprint is set up in your phone settings.")}}
+  else if(a==="fpoff"){try{localStorage.removeItem(FPK())}catch(x){}toast("Fingerprint lock is off");render()}
+  else if(a==="rstclose"){rstRes=null;render()}
+  else if(a==="rsask"){rsq=c;render()}
+  else if(a==="rsdo"){const m=S.members[c];if(!m)return;busy=true;rsq="";render();
+   try{const n=((S.resets[c]||{}).n||0)+1,pin=String(Math.floor(100000+Math.random()*900000)),sa=getAuth(initializeApp(cfg,"sec"+Date.now())),cr=await createUserWithEmailAndPassword(sa,c+"r"+n+DOM,pin+"-"+c);
+    await setDoc(doc(db,"members",c),{uid:cr.user.uid},{merge:true});await setDoc(doc(db,"resets",c),{n});await signOut(sa);
+    rstRes={name:m.name,code:c,pin,phone:m.phone};toast("PIN reset. Send the member the new temporary PIN.")}
+   catch(x){toast("Could not reset the PIN. Try again.")}
+   busy=false;render()}
+  else if(a==="refresh"){await loadMember();toast("Updated")}
+  else if(a==="dismiss"){last=null;render()}
+  else if(a==="report"){await setDoc(doc(db,"reports",id),{code:c,g,k,at:new Date().toISOString()});await loadMember();toast("Sent. Waiting for the admin to confirm.")}
+  else if(a==="confirm"){const s=S.subs[c+"_"+g],m=S.members[c];await setDoc(doc(db,"payments",id),{code:c,g,k,amount:s?amt(s):0,at:new Date().toISOString()});if(S.reports[id])await deleteDoc(doc(db,"reports",id));last={name:m.name,url:wa(m,s,k,g)};render()}
+  else if(a==="undo"){await deleteDoc(doc(db,"payments",id));toast("Payment removed")}
+  else if(a==="reject"){await deleteDoc(doc(db,"reports",id));toast("Removed")}
+  else if(a==="addm"){const n=($("#nm").value||"").trim(),ph=($("#ph").value||"").trim(),nn=($("#nn").value||"").trim(),pin=($("#pn").value||"").trim();
+   if(!n){toast("Enter a name");return}if(!/^\d{6,8}$/.test(pin)){toast("PIN must be 6 to 8 digits");return}
+   busy=true;render();
+   try{const mx=Object.keys(S.members).reduce((x,y)=>Math.max(x,parseInt(y.slice(1))||0),S.settings.maxCode||0),code="m"+String(mx+1).padStart(3,"0");
+    const sec=initializeApp(cfg,"sec"+Date.now()),sa=getAuth(sec),cr=await createUserWithEmailAndPassword(sa,code+DOM,pin+"-"+code);
+    await setDoc(doc(db,"members",code),{code,name:n,nick:nn,phone:ph,uid:cr.user.uid,at:new Date().toISOString()});await setDoc(doc(db,"settings","main"),{maxCode:mx+1},{merge:true});await signOut(sa);
+    toast("Added. Code: "+code.toUpperCase()+"  Temporary PIN: "+pin)}catch(x){toast("Could not add member. Try again.")}
+   busy=false;render()}
+  else if(a==="hands"){const nk=$("#nk_"+c);if(nk)await setDoc(doc(db,"members",c),{nick:nk.value.trim()},{merge:true});for(const gg of ["D","W","M"]){const v=parseFloat($("#h_"+c+"_"+gg).value)||0,r=doc(db,"subs",c+"_"+gg);if(v>0)await setDoc(r,{code:c,g:gg,hands:v});else if(S.subs[c+"_"+gg])await deleteDoc(r)}toast("Saved")}
+  else if(a==="anchor"){const v=$("#anc").value;if(!v){toast("Pick a date");return}await setDoc(doc(db,"settings","main"),{anchor:v},{merge:true});toast("Saved")}
+  else if(a==="remind"){const p=periods(grp)[pi],un=subsFor(grp).filter(s=>stat(s.code,grp,p.k)==="unpaid");
+   remind="Reminder: "+GS[grp]+" contribution for "+p.l+" has not been received from:\n"+un.map((s,i)=>(i+1)+". "+S.members[s.code].name+" ("+N(amt(s))+")").join("\n")+"\n\nPlease pay and tap “I’ve paid” on the website. Thank you.";render()}
+ }catch(x){toast("Something went wrong. Check your internet and try again.")}
+});
+
+/* ---------- START ---------- */
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEv=e;render()});
+window.addEventListener("appinstalled",()=>{installEv=null;render()});
+fpSupported().then(v=>{fpOK=v;render()});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)lastHide=Date.now();else if(auth.currentUser&&fpOn()&&Date.now()-lastHide>90000){locked=true;render()}});
+onAuthStateChanged(auth,async u=>{
+ unsub.forEach(f=>f());unsub=[];firstSnap={};
+ Object.assign(S,{members:{},subs:{},payments:{},reports:{},settings:{},lines:{},payouts:{},resets:{}});
+ busy=false;
+ if(!u){locked=false;view=view==="login"?"login":"landing";admin=false;me="";document.title="KaffySmart Thrift";render();return}
+ if(u.email===ADMIN){admin=true;view="app";locked=skipLock?false:fpOn();skipLock=false;
+  ["members","subs","payments","reports","lines","payouts","resets"].forEach(c=>unsub.push(onSnapshot(c==="payments"?query(collection(db,c),where("at",">=",new Date(Date.now()-170*864e5).toISOString())):collection(db,c),s=>{S[c]={};s.docs.forEach(d=>S[c][d.id]=d.data());
+   if(c==="reports"){if(firstSnap.r&&s.docChanges().some(x=>x.type==="added")){beep();toast("New payment report")}firstSnap.r=1}render()})));
+  unsub.push(onSnapshot(doc(db,"settings","main"),s=>{S.settings=s.data()||{};render()}));render();return}
+ if(u.email&&u.email.endsWith(DOM)){admin=false;me=u.email.split("@")[0].split("r")[0];if(!u.displayName){view="setpin";render();return}locked=skipLock?false:fpOn();skipLock=false;view="app";render();
+  try{await loadMember()}catch(x){err="This account is not set up yet. Please contact the admin.";await signOut(auth)}return}
+ await signOut(auth);
+});
+</script></body></html>
